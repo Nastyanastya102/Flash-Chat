@@ -8,11 +8,13 @@
 
 import UIKit
 import FirebaseAuth
+import FirebaseFirestore
 
 class ChatViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var messageTextfield: UITextField!
+    let db = Firestore.firestore()
     
     var messages: [Message] = [
         Message(sender: "test1@mail.ru", body: "Hello from test1"),
@@ -29,6 +31,23 @@ class ChatViewController: UIViewController {
     }
     
     @IBAction func sendPressed(_ sender: UIButton) {
+        Task { @MainActor in
+            if let mgs = messageTextfield.text, let sender = Auth.auth().currentUser?.email
+            {
+                do {
+                    let ref = try await db.collection(Constants.FStore.collectionName).addDocument(data: [
+                        Constants.FStore.senderField: sender,
+                        Constants.FStore.bodyField: mgs,
+                    ])
+                    print("Sending message with ID: \(ref.documentID)")
+                } catch {
+                    print("Error sending message: \(error)")
+                }
+                
+            } else {
+                
+            }
+        }
     }
     
 
