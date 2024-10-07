@@ -8,6 +8,8 @@
 
 import UIKit
 import FirebaseCore
+import FirebaseFirestore
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -17,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         FirebaseApp.configure()
+        let db = Firestore.firestore()
         return true
     }
 
