@@ -13,18 +13,27 @@ class WelcomeViewController: UIViewController {
 
     @IBOutlet weak var titleLabel: CLTypingLabel!
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.isNavigationBarHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.isNavigationBarHidden = false
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        titleLabel.text = "⚡️FlashChat"
-//        let titleTex = "⚡️FlashChat"
-//        var charIndx = 0.0
-//        for char in titleTex {
-//            Timer.scheduledTimer(withTimeInterval: 0.1 * charIndx, repeats: false) {(timer) in
-//                self.titleLabel.text?.append(char)
-//            }
-//            
-//            charIndx += 1
-//        }
+        let titleTex = "⚡️FlashChat"
+        var charIndx = 0.0
+        for char in titleTex {
+            Timer.scheduledTimer(withTimeInterval: 0.1 * charIndx, repeats: false) {(timer) in
+                self.titleLabel.text?.append(char)
+            }
+            
+            charIndx += 1
+        }
        
     }
     

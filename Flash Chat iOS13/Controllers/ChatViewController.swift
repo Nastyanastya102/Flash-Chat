@@ -22,10 +22,8 @@ class ChatViewController: UIViewController {
         super.viewDidLoad()
         tableView.dataSource = self
         tableView.register(UINib(nibName: Constants.cellNibName, bundle: nil), forCellReuseIdentifier: Constants.cellIdentifier)
-        navigationItem.title = "⚡️FlashChat"
         navigationItem.hidesBackButton = true
         loadMessages()
-
     }
     
     func loadMessages() {
@@ -41,13 +39,14 @@ class ChatViewController: UIViewController {
                 } else {
                     if let snapshotDocuments = querySnapshot?.documents {
                         for doc in snapshotDocuments {
+                            print(doc)
                             let data = doc.data()
                             if let messageSender = data[Constants.FStore.senderField] as? String, let messageBody = data[Constants.FStore.bodyField] as? String {
                                 let newMessage = Message(sender: messageSender, body: messageBody)
                                 self.messages.append(newMessage)
                                 
                                 DispatchQueue.main.async {
-                                       self.tableView.reloadData()
+                                    self.tableView.reloadData()
                                     let indexPath = IndexPath(row: self.messages.count - 1, section: 0)
                                     self.tableView.scrollToRow(at: indexPath, at: .top, animated: false)
                                 }
@@ -66,10 +65,15 @@ class ChatViewController: UIViewController {
                     let ref = try await db.collection(Constants.FStore.collectionName).addDocument(data: [
                         Constants.FStore.senderField: sender,
                         Constants.FStore.bodyField: mgs,
+                        Constants.FStore.dateField: Date().timeIntervalSince1970
                     ])
                     print("Sending message with ID: \(ref.documentID)")
                 } catch {
                     print("Error sending message: \(error)")
+                    
+                    DispatchQueue.main.async {
+                      self.messageTextfield.text = ""
+                    }
                 }
                 
             } else {
@@ -96,8 +100,22 @@ extension ChatViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier, for: indexPath) as! MessageCell
-        
-        cell.label.text = messages[indexPath.row].body
+        let msg = messages[indexPath.row]
+        print(msg)
+        if msg.sender == Auth.auth().currentUser?.email {
+            cell.leftImageView.isHidden = true
+            cell.rightImageView.isHidden = false
+            cell.messageBuble.backgroundColor = UIColor(named: Constants.BrandColors.lightPurple)
+            cell.label.text = msg.body
+            cell.label.textColor = UIColor(named: Constants.BrandColors.purple)
+        } else {
+            cell.leftImageView.isHidden = false
+            cell.rightImageView.isHidden = true
+            cell.messageBuble.backgroundColor = UIColor(named: Constants.BrandColors.purple)
+            cell.label.text = msg.body
+            cell.label.textColor = UIColor(named: Constants.BrandColors.lightPurple)
+        }
+     
         
         return cell
     }
